@@ -2,4 +2,4 @@
 
 ## DQN - Game Play
 
-[![Cartpole - DQN](cartpole.gif))
+![Cartpole - DQN](cartpole.gif)
