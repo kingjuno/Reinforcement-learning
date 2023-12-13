@@ -1,0 +1,6 @@
+torch
+gym
+gym[atari,accept-rom-license]
+opencv-python
+matplotlib
+tqdm

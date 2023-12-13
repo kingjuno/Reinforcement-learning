@@ -23,9 +23,9 @@ class replay_memory:
         return len(self.buffer)
 
 
-class QNet(nn.Module):
+class DQN(nn.Module):
     def __init__(self):
-        super(QNet, self).__init__()
+        super(DQN, self).__init__()
         self.l = nn.Sequential(
             nn.Linear(4, 128),
             nn.ReLU(),
@@ -68,7 +68,7 @@ def gradient_descent():
 
 
 env = gym.make("CartPole-v1")
-net = QNet()
+net = DQN()
 buffer = replay_memory(1000)
 optimizer = torch.optim.Adam(net.parameters())
 
