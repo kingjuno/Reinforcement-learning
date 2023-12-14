@@ -2,9 +2,20 @@
 
 # Index
 
-1. [Algorithms](#algorithms)
+1. [List of Algorithms](#list-of-algorithms)
+2. [Algorithms](#algorithms)
    - [DQN](#dqn)
-2. [References](#references)
+   - [DDQN](#ddqn)
+3. [References](#references)
+
+# List of Algorithms
+
+- [x] DQN
+- [ ] DRQN
+- [ ] Dueling DQN
+- [x] Double DQN (DDQN)
+- [ ] Prioritized Experience Replay (PER)
+- [ ] Rainbow DQN
 
 # Algorithms
 
@@ -61,23 +72,51 @@
 
 3. Perform a gradient descent step on $(y_j − Q(\phi(j), a_j; θ))^2$ according to equation 3
    ```py
-   batches = buffer.replay(size=batch_size)
-   states, actions, rewards, new_states, done = zip(*batches)
-   states = Tensor(list(states), requires_grad=True)
-   new_states = Tensor(list(new_states), requires_grad=False)
-   rewards = Tensor(list(rewards), requires_grad=True)
-   actions = Tensor(list(actions), requires_grad=True)
-   done = Tensor(list(done), requires_grad=True)
-   q_values = net(states)
-   q_value_next = net(new_state)
-   q_value = Tensor(
-       [i[act].numpy() for i, act in zip(q_values, actions)], requires_grad=True
-   )
-   y = rewards + gamma * (1 - done) * q_value_next.max(1)[0]
-   gradient = (y - q_value).pow(2).mean()
-   gradient.backward()
+   def gradient_descent():
+        batches = buffer.replay(size=batch_size)
+        states, actions, rewards, new_states, done = zip(*batches)
+        states = torch.tensor(states)
+        with torch.no_grad():
+            new_states = torch.tensor(new_states)
+        rewards = torch.FloatTensor(rewards)
+        actions = torch.LongTensor(actions)
+        done = torch.FloatTensor(done)
+        q_values = net(states)
+        q_value_next = net(new_states)
+        q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
+        y = rewards + gamma * (1 - done) * q_value_next.max(1)[0]
+        gradient = (y - q_value).pow(2).mean()
+        optimizer.zero_grad()
+        gradient.backward()
+        optimizer.step()
    ```
+
+## DDQN
+
+$$
+\begin{equation}
+y_j = r_j + \gamma Q(S_{t+1}, \argmax_{a'} Q(S_{t+1}, a'; \theta); \theta^-)
+\end{equation}
+$$
+
+where $\theta^-$ are the parameters of the target network, which are only updated with the main network every $C$ steps.
+
+Compared to DQN, the main difference is in gradient_descent function.
+
+```py
+q_values = net(states)
+q_value_next = net(new_states)
+q_value_next_target = target(new_states)
+
+
+q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
+# Double DQN
+# y = R + gamma Q(s', argmax_a Q(s', a))
+_argmax = q_value_next_target.argmax(1)
+y = rewards + gamma * (1 - done) * q_value_next[torch.arange(len(_argmax)), _argmax]
+```
 
 # References
 
-[1] [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), Mnih et al, 2013. Algorithm: DQN.
+[1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
+[2] [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/pdf/1509.06461.pdf), Hasselt et al, 2015. Algorithm: DDQN.
