@@ -14,14 +14,14 @@
 - [ ] DRQN
 - [ ] Dueling DQN
 - [x] Double DQN (DDQN)
-- [ ] Prioritized Experience Replay (PER)
+- [x] Prioritized Experience Replay (PER)
 - [ ] Rainbow DQN
 
 # Algorithms
 
 ## DQN
 
-![Alt text](../assets/algorithm.png)
+![Alt text](../assets/DQN.png)
 
 1. Initialize replay memory D to capacity N
 
@@ -115,6 +115,36 @@ q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
 _argmax = q_value_next_target.argmax(1)
 y = rewards + gamma * (1 - done) * q_value_next[torch.arange(len(_argmax)), _argmax]
 ```
+
+## PER
+
+![PER](../assets/PER.png)
+
+### Without Sum Tree
+
+- $P(j)$
+  - Prioritized
+    - $P(j) = \frac{p_j^\alpha}{\sum_k p_k^\alpha}$
+    - $p_j = |\delta_j| + \epsilon$
+    ```py
+    Pj = np.array(self.priorities) ** self.alpha
+    sumPj = sum(Pj)
+    Pj = Pj / sumPj
+    ```
+  - Rank-based
+    - $P(j) = \frac{1}{rank(j)}$
+    ```py
+    Pj = np.array(self.priorities)
+    sorted_indices = np.argsort(Pj)[::-1]
+    ranks = np.empty_like(sorted_indices)
+    ranks[sorted_indices] = np.arange(1, len(Pj) + 1)
+    Pj = 1 / ranks
+    ```
+- $w_j = \frac{\left({N}. {P(j)}\right)^{-\beta}}{max_i w_i}$
+  ```py
+  wj = (self.N * _Pj) ** (-self.beta)
+  wj = wj / max(wj)
+  ```
 
 # References
 
