@@ -6,14 +6,16 @@
 2. [Algorithms](#algorithms)
    - [DQN](#dqn)
    - [DDQN](#ddqn)
+   - [PER](#per)
+   - [Dueling DQN](#dueling-dqn)
 3. [References](#references)
 
 # List of Algorithms
 
 - [x] DQN
 - [ ] DRQN
-- [ ] Dueling DQN
 - [x] Double DQN (DDQN)
+- [x] Dueling DQN
 - [x] Prioritized Experience Replay (PER)
 - [ ] Rainbow DQN
 
@@ -146,7 +148,35 @@ y = rewards + gamma * (1 - done) * q_value_next[torch.arange(len(_argmax)), _arg
   wj = wj / max(wj)
   ```
 
+## Dueling DQN
+
+![Dueling DQN](../assets/DuelingDQN.png)
+
+Changes compared to DQN:
+
+Authors introduced:
+```py
+self.state = nn.Sequential(
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+)
+self.advantage = nn.Sequential(
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 2),
+)
+```
+
+Forward function:
+
+$Q(s,a;\theta,\alpha,\beta) = V(s;\theta,\beta) + \left(A(s,a;\theta,\alpha) - \frac{1}{|A|} \sum_{a'} A(s,a';\theta,\alpha)\right)$
+
+Nice read: https://ai.stackexchange.com/questions/8128/questions-on-the-identifiability-issue-and-equations-8-and-9-in-the-d3qn-paper
+
 # References
 
 [1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
 [2] [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/pdf/1509.06461.pdf), Hasselt et al, 2015. Algorithm: DDQN.
+[3] [Prioritized Experience Replay](https://arxiv.org/pdf/1511.05952.pdf), Schaul et al, 2015. Algorithm: PER.
+[4] [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/pdf/1511.06581.pdf), Wang et al, 2015. Algorithm: Dueling DQN.
