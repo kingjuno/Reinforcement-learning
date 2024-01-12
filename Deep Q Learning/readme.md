@@ -99,7 +99,7 @@
 
 $$
 \begin{equation}
-y_j = r_j + \gamma Q(S_{t+1}, \argmax_{a'} Q(S_{t+1}, a'; \theta); \theta^-)
+y_j = r_j + \gamma Q(S_{t+1}, argmax_{a'} Q(S_{t+1}, a'; \theta); \theta^-)
 \end{equation}
 $$
 
@@ -229,9 +229,6 @@ class NoisyLinear(nn.Module):
         self.weight_noise.data.uniform_(-range, range)
         self.bias_noise.data.fill_(0.5 * range)
 
-    def extra_repr(self) -> str:
-        return f"in_features={self.in_features}, out_features={self.out_features}, bias={self.bias is not None}"
-
     def forward(self, x):
         if self.training:
             w = self.weight_mean + self.weight_std.mul(self.weight_noise)
@@ -250,7 +247,11 @@ For factorised noisy networks, each element $\mu_{i,j}$ was initialised by a sam
 # References
 
 [1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
+
 [2] [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/pdf/1509.06461.pdf), Hasselt et al, 2015. Algorithm: DDQN.
+
 [3] [Prioritized Experience Replay](https://arxiv.org/pdf/1511.05952.pdf), Schaul et al, 2015. Algorithm: PER.
+
 [4] [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/pdf/1511.06581.pdf), Wang et al, 2015. Algorithm: Dueling DQN.
+
 [5] [Noisy Networks for Exploration](https://arxiv.org/pdf/1706.10295.pdf), Meire Fortunato et al, 2017, Algorithm: Noisy Networks
