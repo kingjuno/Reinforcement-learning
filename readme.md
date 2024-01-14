@@ -12,6 +12,5 @@
 - [ ] Rainbow DQN
 
 ### Model Based RL
-#### Model is given
 - [ ] Alpha-zero
 
