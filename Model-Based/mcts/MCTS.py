@@ -18,16 +18,15 @@ class TreeNode:
 
 
 class MCTS:
-    def search(self, state, num_simulations=10):
+    def search(self, state, num_simulations=1000):
         root = TreeNode(state, None)
         start = time.time()
         for _ in range(num_simulations):
             node = self.select(root)
             score = self.simulate(node)
             self.back_propagate(node, score)
-            # if time.time() - start >= 1:
-            #     break
-        print(time.time() - start)
+            if time.time() - start >= 1:
+                break
         action = self.select_best_action(root)
         return action
 

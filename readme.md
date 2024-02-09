@@ -16,7 +16,7 @@
 
 #### Distributional RL
 
-- [x] [Categorical DQN](Model-Free//Categorical-DQN.py)
+- [x] [Categorical DQN](Model-Free/Categorical-DQN(c51).ipynb)
 - [ ] Quantile Regression DQN
 
 ### 2. Model Based RL

@@ -9,6 +9,7 @@
    - [PER](#per)
    - [Dueling DQN](#dueling-dqn)
    - [Noisy DQN](#noisy-dqn)
+   - [Categorical DQN](#categorical-dqn-c51)
 3. [References](#references)
 
 # List of Algorithms
@@ -19,6 +20,7 @@
 - [x] Dueling DQN
 - [x] Prioritized Experience Replay (PER)
 - [x] Noisy DQN
+- [x] Categorial DQN
 - [ ] Rainbow DQN
 
 # Algorithms
@@ -244,6 +246,50 @@ Each element $\mu_{i,j}$ is sampled from independent uniform distributions $U[�
 
 For factorised noisy networks, each element $\mu_{i,j}$ was initialised by a sample from an independent uniform distributions $U[−\frac{\sqrt{1}}{p},+\frac{\sqrt{1}}{p}]$ and each element $\sigma_{i,j}$ was initialised to a constant $\frac{\sigma_0}{\sqrt{p}}$ . The hyperparameter $\sigma_0$ is set to 0.5.
 
+## Categorical DQN (C51)
+
+![Alt text](../assets/c51.png)
+1. Finding Projection distribution
+    ```python
+    def projection_distribution(next_state, rewards, dones):
+        batch_size = next_state.size(0)
+        delta_z = (Vmax - Vmin) / (num_atoms - 1)
+        support = torch.linspace(Vmin, Vmax, num_atoms).to(device)
+        next_dist = target(next_state) * support
+        next_act = next_dist.sum(2).max(1)[1]
+        next_dist = next_dist[torch.arange(next_dist.size(0)), next_act.data]
+
+        rewards = rewards.view(-1, 1).expand([batch_size, num_atoms])
+        dones = dones.view(-1, 1).expand([batch_size, num_atoms])
+
+        Tz = rewards + gamma * (1 - dones) * support
+        Tz = Tz.clamp(min=Vmin, max=Vmax)
+        bj = (Tz - Vmin) / delta_z
+        l = torch.floor(bj).long()
+        u = torch.ceil(bj).long()
+
+        probl = next_dist * (u - bj)
+        probu = next_dist * (bj - l)
+
+        # Do not use a double for loop here, it slows down the program
+        m = torch.zeros(batch_size, num_atoms).to(device)
+        m.scatter_add_(1, l, probl)
+        m.scatter_add_(1, u, probu)
+        return m
+    ```
+
+2. Cross Entropy Loss
+    ```python
+    pro_dist = projection_distribution(next_states, rewards, done)
+
+    dist =  net(states)
+    dist = dist[torch.arange(len(actions)), actions]
+    
+    loss = (-(pro_dist * dist.clamp(min=1e-5, max=1 - 1e-5).log()).sum(-1)).mean()
+    ```
+
+[NOTE]: I tried this with atari, and it takes a lot of time compared to DQN while training. Authors of this paper mentioned that *For N = 51, our TensorFlow implementation trains at roughly 75% of DQN’s speed*. Another thing to note is if you find the code is slowing down with time, try reducing the buffer size.
+
 # References
 
 [1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
@@ -255,3 +301,5 @@ For factorised noisy networks, each element $\mu_{i,j}$ was initialised by a sam
 [4] [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/pdf/1511.06581.pdf), Wang et al, 2015. Algorithm: Dueling DQN.
 
 [5] [Noisy Networks for Exploration](https://arxiv.org/pdf/1706.10295.pdf), Meire Fortunato et al, 2017, Algorithm: Noisy Networks
+
+[6] [A Distributional Perspective on Reinforcement Learning](https://arxiv.org/pdf/1707.06887.pdf), Bellemare et al, 2017. Algorithm: Categorical DQN
