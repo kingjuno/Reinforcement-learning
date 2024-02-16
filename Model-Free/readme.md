@@ -297,8 +297,10 @@ NOTE 1: I tried this with atari, and it takes a lot of time compared to DQN whil
 NOTE 2:
 
 For
-$m_l \rightarrow m_l + p_j (x_{t+1}, a^*)(u-b_j)$
-$m_u \leftarrow m_u + p_j (x_{t+1}, a^*)(b_j-l)$
+
+$m_l \rightarrow m_l + p_j(x_{t+1}, a^\star)(u-b_j)$<br>
+$m_u \leftarrow m_u + p_j (x_{t+1}, a^\star)(b_j-l)$
+
 We do this
 
 ```python
