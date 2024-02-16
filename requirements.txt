@@ -4,3 +4,5 @@ gym[atari,accept-rom-license]
 opencv-python
 matplotlib
 tqdm
+gymnasium[mujoco]
+gym[classic_control]

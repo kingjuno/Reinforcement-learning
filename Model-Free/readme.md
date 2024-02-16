@@ -10,6 +10,7 @@
    - [Dueling DQN](#dueling-dqn)
    - [Noisy DQN](#noisy-dqn)
    - [Categorical DQN](#categorical-dqn-c51)
+   - [Rainbow DQN](#rainbow-dqn)
 3. [References](#references)
 
 # List of Algorithms
@@ -21,7 +22,7 @@
 - [x] Prioritized Experience Replay (PER)
 - [x] Noisy DQN
 - [x] Categorial DQN
-- [ ] Rainbow DQN
+- [x] Rainbow DQN
 
 # Algorithms
 
@@ -345,6 +346,17 @@ m.scatter_add_(1, l, probl)
 m.scatter_add_(1, u, probu)
 ```
 
+## Rainbow DQN
+
+Here we combine:
+
+- DDQN
+- PER
+- Dueling Network
+- Distributional RL
+- Noisy Net
+- N-step learning (didn't add; but isnt that hard to add)
+
 # References
 
 [1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
@@ -358,3 +370,5 @@ m.scatter_add_(1, u, probu)
 [5] [Noisy Networks for Exploration](https://arxiv.org/pdf/1706.10295.pdf), Meire Fortunato et al, 2017, Algorithm: Noisy Networks
 
 [6] [A Distributional Perspective on Reinforcement Learning](https://arxiv.org/pdf/1707.06887.pdf), Bellemare et al, 2017. Algorithm: Categorical DQN
+
+[7] [Rainbow: Combining Improvements in Deep Reinforcement Learning](http://arxiv.org/abs/1710.02298), Hessel et al, 2017. Algorithm: Rainbow DQN
