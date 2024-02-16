@@ -58,7 +58,7 @@ class NoisyLinear(nn.Module):
         self.bias_noise.data.fill_(0.5 * range)
 
     def extra_repr(self) -> str:
-        return f"in_features={self.in_features}, out_features={self.out_features}, bias={self.bias is not None}"
+        return f"in_features={self.in_features}, out_features={self.out_features}"
 
     def forward(self, x):
         if self.training:

@@ -249,46 +249,101 @@ For factorised noisy networks, each element $\mu_{i,j}$ was initialised by a sam
 ## Categorical DQN (C51)
 
 ![Alt text](../assets/c51.png)
+
 1. Finding Projection distribution
-    ```python
-    def projection_distribution(next_state, rewards, dones):
-        batch_size = next_state.size(0)
-        delta_z = (Vmax - Vmin) / (num_atoms - 1)
-        support = torch.linspace(Vmin, Vmax, num_atoms).to(device)
-        next_dist = target(next_state) * support
-        next_act = next_dist.sum(2).max(1)[1]
-        next_dist = next_dist[torch.arange(next_dist.size(0)), next_act.data]
 
-        rewards = rewards.view(-1, 1).expand([batch_size, num_atoms])
-        dones = dones.view(-1, 1).expand([batch_size, num_atoms])
+   ```python
+   def projection_distribution(next_state, rewards, dones):
+       batch_size = next_state.size(0)
+       delta_z = (Vmax - Vmin) / (num_atoms - 1)
+       support = torch.linspace(Vmin, Vmax, num_atoms).to(device)
+       next_dist = target(next_state) * support
+       next_act = next_dist.sum(2).max(1)[1]
+       next_dist = next_dist[torch.arange(next_dist.size(0)), next_act.data]
 
-        Tz = rewards + gamma * (1 - dones) * support
-        Tz = Tz.clamp(min=Vmin, max=Vmax)
-        bj = (Tz - Vmin) / delta_z
-        l = torch.floor(bj).long()
-        u = torch.ceil(bj).long()
+       rewards = rewards.view(-1, 1).expand([batch_size, num_atoms])
+       dones = dones.view(-1, 1).expand([batch_size, num_atoms])
 
-        probl = next_dist * (u - bj)
-        probu = next_dist * (bj - l)
+       Tz = rewards + gamma * (1 - dones) * support
+       Tz = Tz.clamp(min=Vmin, max=Vmax)
+       bj = (Tz - Vmin) / delta_z
+       l = torch.floor(bj).long()
+       u = torch.ceil(bj).long()
 
-        # Do not use a double for loop here, it slows down the program
-        m = torch.zeros(batch_size, num_atoms).to(device)
-        m.scatter_add_(1, l, probl)
-        m.scatter_add_(1, u, probu)
-        return m
-    ```
+       probl = next_dist * (u - bj)
+       probu = next_dist * (bj - l)
+
+       # Do not use a double for loop here, it slows down the program
+       m = torch.zeros(batch_size, num_atoms).to(device)
+       m.scatter_add_(1, l, probl)
+       m.scatter_add_(1, u, probu)
+       return m
+   ```
 
 2. Cross Entropy Loss
-    ```python
-    pro_dist = projection_distribution(next_states, rewards, done)
 
-    dist =  net(states)
-    dist = dist[torch.arange(len(actions)), actions]
-    
-    loss = (-(pro_dist * dist.clamp(min=1e-5, max=1 - 1e-5).log()).sum(-1)).mean()
-    ```
+   ```python
+   pro_dist = projection_distribution(next_states, rewards, done)
 
-[NOTE]: I tried this with atari, and it takes a lot of time compared to DQN while training. Authors of this paper mentioned that *For N = 51, our TensorFlow implementation trains at roughly 75% of DQN’s speed*. Another thing to note is if you find the code is slowing down with time, try reducing the buffer size.
+   dist =  net(states)
+   dist = dist[torch.arange(len(actions)), actions]
+
+   loss = (-(pro_dist * dist.clamp(min=1e-5, max=1 - 1e-5).log()).sum(-1)).mean()
+   ```
+
+NOTE 1: I tried this with atari, and it takes a lot of time compared to DQN while training. Authors of this paper mentioned that _For N = 51, our TensorFlow implementation trains at roughly 75% of DQN’s speed_. Another thing to note is if you find the code is slowing down with time, try reducing the buffer size.
+
+NOTE 2:
+
+For
+$m_l \rightarrow m_l + p_j (x_{t+1}, a^*)(u-b_j)$
+$m_u \leftarrow m_u + p_j (x_{t+1}, a^*)(b_j-l)$
+We do this
+
+```python
+m = torch.zeros(batch_size, num_atoms).to(device)
+for i in range(m.shape[0]):
+     for j in range(m.shape[1]):
+        m[i, l[i,j]] += probl[i,j]
+        m[i, u[i,j]] += probu[i,j]
+```
+
+why not this?
+
+```python
+m[i, l] += next_dist * (u.float() - bj)
+m[i, u] += next_dist * (bj - l.float())
+```
+
+this wont work because of some duplicate index present in it
+for example say 25 appears twice, then the commented code only takes
+sum once which is wrong
+
+proof:
+
+```python
+m = torch.zeros(10)
+l = torch.arange(0, 10, 1)
+l[4]=l[3]
+print('index:',l)
+m[l] += torch.ones(10)
+print(m)
+```
+
+`>>> index: tensor([0, 1, 2, 3, 3, 5, 6, 7, 8, 9])`<br>
+`tensor([1., 1., 1., 1., 0., 1., 1., 1., 1., 1.])`
+
+we expect m[3] to be 2 since 3 appears twice.
+
+Instead we can use this vectorised version which is really fast compared to double loop:
+
+Vectorised version:
+
+```python
+m = torch.zeros(batch_size, num_atoms).to(device)
+m.scatter_add_(1, l, probl)
+m.scatter_add_(1, u, probu)
+```
 
 # References
 

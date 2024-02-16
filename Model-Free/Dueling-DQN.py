@@ -62,29 +62,6 @@ class DuelDQN(nn.Module):
 
 
 def gradient_descent():
-    batches, idx, weights = buffer.replay(size=batch_size)
-    states, actions, rewards, new_states, done = zip(*batches)
-    states = torch.tensor(states)
-    with torch.no_grad():
-        new_states = torch.tensor(new_states)
-    rewards = torch.FloatTensor(rewards)
-    actions = torch.LongTensor(actions)
-    done = torch.FloatTensor(done)
-    weights = torch.FloatTensor(weights)
-    q_values = net(states)
-    q_value_next = net(new_states)
-    q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
-    y = rewards + gamma * (1 - done) * q_value_next.max(1)[0]
-    td_error = torch.abs(y - q_value).detach()
-    loss = (weights * (y - q_value) ** 2).mean()
-    buffer.set_priority(td_error, idx)
-
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-
-
-def gradient_descent():
     batches = buffer.replay(size=batch_size)
     states, actions, rewards, new_states, done = zip(*batches)
     states = torch.tensor(states)
