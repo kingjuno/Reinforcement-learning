@@ -37,7 +37,7 @@ class DQN(nn.Module):
 
 def gradient_descent():
     batches, idx, weights = buffer.replay(size=batch_size)
-    states, actions, rewards, new_states, done = zip(*batches)
+    states, actions, rewards, new_states, done = batches
     states = torch.tensor(states)
     with torch.no_grad():
         new_states = torch.tensor(new_states)

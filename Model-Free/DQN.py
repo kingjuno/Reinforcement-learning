@@ -61,9 +61,9 @@ def gradient_descent():
     q_value_next = net(new_states)
     q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
     y = rewards + gamma * (1 - done) * q_value_next.max(1)[0]
-    gradient = (y - q_value).pow(2).mean()
+    loss = (y - q_value).pow(2).mean()
     optimizer.zero_grad()
-    gradient.backward()
+    loss.backward()
     optimizer.step()
 
 

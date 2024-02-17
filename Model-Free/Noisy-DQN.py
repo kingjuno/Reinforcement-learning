@@ -50,7 +50,7 @@ class NoisyLinear(nn.Module):
         self.weight_mean.data.uniform_(-range, range)
         self.weight_std.data.fill_(0.017)
         self.bias_mean.data.uniform_(-range, range)
-        self.bias_mean.data.fill_(0.017)
+        self.bias_std.data.fill_(0.017)
 
     def reset_noise(self):
         range = math.sqrt(1 / self.out_features)
@@ -128,9 +128,9 @@ def gradient_descent():
     q_value_next = net(new_states)
     q_value = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
     y = rewards + gamma * (1 - done) * q_value_next.max(1)[0]
-    gradient = (y - q_value).pow(2).mean()
+    loss = (y - q_value).pow(2).mean()
     optimizer.zero_grad()
-    gradient.backward()
+    loss.backward()
     optimizer.step()
     net.reset_noise()
 

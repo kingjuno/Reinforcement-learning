@@ -69,9 +69,9 @@ def gradient_descent_double_dqn():
     # y = R + gamma Q(s', argmax_a Q(s', a))
     _argmax = q_value_next_target.argmax(1)
     y = rewards + gamma * (1 - done) * q_value_next[torch.arange(len(_argmax)), _argmax]
-    gradient = (y - q_value).pow(2).mean()
+    loss = (y - q_value).pow(2).mean()
     optimizer.zero_grad()
-    gradient.backward()
+    loss.backward()
     optimizer.step()
 
 env = gym.make("CartPole-v1")

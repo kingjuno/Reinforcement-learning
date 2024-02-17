@@ -42,7 +42,7 @@ class NoisyLinear(nn.Module):
         self.weight_mean.data.uniform_(-range, range)
         self.weight_std.data.fill_(0.017)
         self.bias_mean.data.uniform_(-range, range)
-        self.bias_mean.data.fill_(0.017)
+        self.bias_std.data.fill_(0.017)
 
     def reset_noise(self):
         range = math.sqrt(1 / self.out_features)

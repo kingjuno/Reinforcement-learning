@@ -93,7 +93,7 @@ def projection_distribution(next_state, rewards, dones):
 
 def gradient_descent():
     batches, idx, weights = buffer.replay(size=batch_size)
-    states, actions, rewards, next_states, done = zip(*batches)
+    states, actions, rewards, next_states, done = batches
     states = torch.tensor(states, dtype=torch.float32).to(device)
     with torch.no_grad():
         next_states = torch.tensor(next_states, dtype=torch.float32).to(device)

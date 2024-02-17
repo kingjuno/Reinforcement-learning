@@ -20,6 +20,8 @@ class PrioritizedReplayMemory:
 
     def store(self, state, action, reward, next_state, done):
         priority = max(self.priorities) if self.priorities else 1
+        state = np.expand_dims(state, 0)
+        next_state = np.expand_dims(next_state, 0)
         self.buffer.append([state, action, reward, next_state, done])
         self.priorities.append(priority)
 
@@ -42,7 +44,16 @@ class PrioritizedReplayMemory:
         Pj = self.get_priority()
         # sample transition
         idx = np.random.choice(len(self), size, p=Pj)
-        samples = [self.buffer[i] for i in idx]
+        states, actions, rewards, new_states, dones = zip(
+            *[self.buffer[i] for i in idx]
+        )
+        samples = [
+            np.concatenate(states),
+            actions,
+            rewards,
+            np.concatenate(new_states),
+            dones,
+        ]
         _Pj = Pj[idx]
         wj = (self.N * _Pj) ** (-self.beta)
         wj = wj / max(wj)
