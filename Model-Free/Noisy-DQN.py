@@ -140,7 +140,7 @@ buffer = replay_memory(1000)
 optimizer = torch.optim.Adam(net.parameters())
 
 
-episodes = 10000
+no_of_frames = 10000
 _e1, _e2, _ed = 1.0, 0.01, 500
 f = lambda x: _e2 + (_e1 - _e2) * np.exp(-x / _ed)
 batch_size = 32
@@ -149,7 +149,7 @@ gamma = 0.99
 rew = 0
 rewards = []
 state, _ = env.reset()
-for i in tqdm.tqdm(range(1, 1 + episodes), desc="Mean Reward: 0"):
+for i in tqdm.tqdm(range(1, 1 + no_of_frames), desc="Mean Reward: 0"):
     action = net.act(state, f(i))
     new_state, reward, done, _, _ = env.step(action)
     buffer.store(state, action, reward, new_state, float(done))
