@@ -1,0 +1,3 @@
+[submodule "Model-Based/alphago"]
+	path = Model-Based/alphago
+	url = https://github.com/kingjuno/alphago
