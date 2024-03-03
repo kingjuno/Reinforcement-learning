@@ -12,16 +12,22 @@
 - [x] [Dueling DQN](Model-Free//Dueling-DQN.py)
 - [x] [Prioritized Experience Replay](Model-Free//Priotitized%20Experience%20Replay/)
 - [x] [Noisy DQN](Model-Free//Noisy-DQN.py)
-- [ ] Rainbow DQN
+- [x] [Rainbow DQN](Model-Free/rainbow-dqn.py)
+
+#### Deterministic Policy Gradients
+
+- [x] [DDPG](Model-Free/DDPG.py)
 
 #### Distributional RL
 
-- [x] [Categorical DQN](Model-Free/Categorical-DQN(c51).ipynb)
+- [x] [Categorical DQN](<Model-Free/Categorical-DQN(c51).ipynb>)
 - [ ] Quantile Regression DQN
 
 ### 2. Model Based RL
 
 #### Model is Given
 
-- [ ] Alpha-zero
+- [ ] Alpha-Go
   - [x] [Monte Carlo Tree Search](Model-Based/mcts)
+  - [x] [AlphaGo](Model-Based/alphago/)
+  - [ ] [Alpha Zero]()

@@ -83,7 +83,7 @@ class replay_memory:
             *random.sample(self.buffer, batch_size)
         )
 
-        return [np.concatenate(state), action, np.concatenate(new_state), reward, done]
+        return [np.concatenate(state), np.array(action), np.concatenate(new_state), reward, done]
 
     def __len__(self):
         return len(self.buffer)

@@ -11,6 +11,7 @@
    - [Noisy DQN](#noisy-dqn)
    - [Categorical DQN](#categorical-dqn-c51)
    - [Rainbow DQN](#rainbow-dqn)
+   - [DDPG](#ddpg)
 3. [References](#references)
 
 # List of Algorithms
@@ -359,6 +360,10 @@ Here we combine:
 - Noisy Net
 - N-step learning (didn't add; but isnt that hard to add)
 
+## DDPG
+
+![DDPG](/assets/ddpg.png)
+
 # References
 
 [1] [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/pdf/1312.5602.pdf), Mnih et al, 2013. Algorithm: DQN.
@@ -374,3 +379,5 @@ Here we combine:
 [6] [A Distributional Perspective on Reinforcement Learning](https://arxiv.org/pdf/1707.06887.pdf), Bellemare et al, 2017. Algorithm: Categorical DQN
 
 [7] [Rainbow: Combining Improvements in Deep Reinforcement Learning](http://arxiv.org/abs/1710.02298), Hessel et al, 2017. Algorithm: Rainbow DQN
+
+[8] [Continuous control with Deep Reinforcement Learning](http://arxiv.org/abs/1509.02971), Lillicrap et al, 2016, Algorithm: DDPG
